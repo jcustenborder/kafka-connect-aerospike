@@ -52,7 +52,7 @@ public class AerospikeConnectorConfigTest {
 
   @TestFactory
   public Stream<DynamicTest> clientPolicy() {
-    return Arrays.asList(
+    return Stream.of(
         test(AerospikeConnectorConfig.WRITE_POLICY_SEND_KEY_CONF, true, clientPolicy -> clientPolicy.writePolicyDefault.sendKey),
         test(AerospikeConnectorConfig.WRITE_POLICY_DURABLE_DELETE_CONF, true, clientPolicy -> clientPolicy.writePolicyDefault.durableDelete),
         test(AerospikeConnectorConfig.CONN_AUTH_MODE_CONFIG, AuthMode.EXTERNAL, clientPolicy -> clientPolicy.authMode),
@@ -62,7 +62,7 @@ public class AerospikeConnectorConfigTest {
         test(AerospikeConnectorConfig.CONN_USERNAME_CONFIG, "user123", clientPolicy -> clientPolicy.user),
         test(AerospikeConnectorConfig.CONN_CLUSTER_NAME_CONFIG, "cluster1", clientPolicy -> clientPolicy.clusterName),
         test(AerospikeConnectorConfig.CONN_CONNECTION_LOGIN_TIMEOUT_CONFIG, 12345, clientPolicy -> clientPolicy.loginTimeout)
-    ).stream();
+    );
   }
 
 

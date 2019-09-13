@@ -26,7 +26,9 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Schema.Type;
+import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.sink.SinkTaskContext;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +79,94 @@ public abstract class AbstractAerospikeSinkTaskIT {
     this.settings.put(AerospikeConnectorConfig.HOSTS_CONFIG, String.format("%s:%s", address.getHostString(), address.getPort()));
   }
 
+  void dataTypeTest(Schema.Type dataType, Object input) {
+    dataTypeTest(dataType, input, input);
+  }
+
+  void dataTypeTest(Schema.Type dataType, Object input, Object expected) {
+    dataTypeTest(SchemaBuilder.type(dataType).build(), input, expected);
+  }
+
+  void dataTypeTest(Schema schema, Object input, Object expected) {
+    String topic = String.format("dataType%s%s", schema.type(), schema.name());
+    when(this.sinkTaskContext.assignment()).thenReturn(ImmutableSet.of(new TopicPartition(topic, 1)));
+    this.task.start(this.settings);
+
+    Schema structSchema = SchemaBuilder.struct()
+        .field("testField", schema)
+        .build();
+    Struct struct = new Struct(structSchema);
+    struct.put("testField", input);
+
+    String keyText = String.format("key-%s", topic);
+    Key key = new Key(NAMESPACE, topic, keyText);
+
+
+    this.recordHelper.write(
+        sinkRecord -> {
+          Record record = aerospikeClient.get(null, key);
+          assertNotNull(record, "Record should not be null. Key = " + key);
+          Object fieldValue = record.getValue("testField");
+          assertEquals(expected, fieldValue);
+        },
+        topic,
+        Schema.STRING_SCHEMA,
+        keyText,
+        structSchema,
+        struct
+    );
+
+    this.task.put(this.recordHelper.records());
+    this.recordHelper.verify();
+
+  }
+
+  @Test
+  public void datatypeString() {
+    dataTypeTest(Type.STRING, "this is a test");
+  }
+
+  @Test
+  public void datatypeINT8() {
+    dataTypeTest(Type.INT8, Byte.MAX_VALUE, (long) Byte.MAX_VALUE);
+  }
+
+  @Test
+  public void datatypeINT16() {
+    dataTypeTest(Type.INT16, Short.MAX_VALUE, (long) Short.MAX_VALUE);
+  }
+
+  @Test
+  public void datatypeINT32() {
+    dataTypeTest(Type.INT32, Integer.MAX_VALUE, (long) Integer.MAX_VALUE);
+  }
+
+  @Test
+  public void datatypeINT64() {
+    dataTypeTest(Type.INT64, Long.MAX_VALUE);
+  }
+
+  @Test
+  public void datatypeFloat64() {
+    dataTypeTest(Type.FLOAT64, Double.MAX_VALUE);
+  }
+
+  @Test
+  public void datatypeFloat32() {
+    dataTypeTest(Type.FLOAT32, Float.MAX_VALUE, (double) Float.MAX_VALUE);
+  }
+
+  @Test
+  public void datatypeBOOLEAN() {
+    dataTypeTest(Type.BOOLEAN, true, 1L);
+  }
+
+
+  @Test
+  public void datatypeTimestamp() {
+    Date input = new Date(1568408573123L);
+    dataTypeTest(Timestamp.SCHEMA, input, input);
+  }
 
   @Test
   public void offsetsExist() {
