@@ -1,0 +1,6 @@
+version: "2"
+services:
+  aerospike:
+    image: aerospike/aerospike-server:4.6.0.4
+    ports:
+      - '3000:3000'

@@ -26,11 +26,11 @@
         <artifactId>kafka-connect-parent</artifactId>
         <version>2.2.1-cp1</version>
     </parent>
-    <artifactId>kafka-connect-example</artifactId>
+    <artifactId>kafka-connect-aerospike</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-    <name>kafka-connect-example</name>
-    <description>A Kafka Connect connector receiving data from example.</description>
-    <url>https://github.com/jcustenborder/kafka-connect-example</url>
+    <name>kafka-connect-aerospike</name>
+    <description>A Kafka Connect connector receiving data from aerospike.</description>
+    <url>https://github.com/jcustenborder/kafka-connect-aerospike</url>
     <inceptionYear>2019</inceptionYear>
     <licenses>
         <license>
@@ -50,38 +50,24 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:https://github.com/jcustenborder/kafka-connect-example.git</connection>
-        <developerConnection>scm:git:git@github.com:jcustenborder/kafka-connect-example.git
+        <connection>scm:git:https://github.com/jcustenborder/kafka-connect-aerospike.git</connection>
+        <developerConnection>scm:git:git@github.com:jcustenborder/kafka-connect-aerospike.git
         </developerConnection>
-        <url>https://github.com/jcustenborder/kafka-connect-example</url>
+        <url>https://github.com/jcustenborder/kafka-connect-aerospike</url>
     </scm>
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/jcustenborder/kafka-connect-example/issues</url>
+        <url>https://github.com/jcustenborder/kafka-connect-aerospike/issues</url>
     </issueManagement>
-    <dependencies/>
+    <dependencies>
+<dependency>
+  <groupId>com.aerospike</groupId>
+  <artifactId>aerospike-client</artifactId>
+  <version>4.4.5</version>
+</dependency>
+</dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.jcustenborder.maven.plugins</groupId>
-                <artifactId>kafka-connect-maven-plugin</artifactId>
-                <version>0.1.2</version>
-                <executions>
-                    <execution>
-                        <id>generate-config</id>
-                        <goals>
-                            <goal>generate-config-classes</goal>
-                        </goals>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <includeFiles>
-                                <includeFile>src/main/connect-config-classes/*.json</includeFile>
-                            </includeFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!--
             Uncomment to prepare a package for the Confluent Hub.
             <plugin>

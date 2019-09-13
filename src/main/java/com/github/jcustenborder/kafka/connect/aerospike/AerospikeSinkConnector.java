@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.example;
+package com.github.jcustenborder.kafka.connect.aerospike;
 
 import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
@@ -26,12 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 @Description("This is the description of the connector.")
-public class ExampleSinkConnector extends SinkConnector {
+public class AerospikeSinkConnector extends SinkConnector {
   Map<String, String> settings;
 
   @Override
   public void start(Map<String, String> settings) {
-    ExampleSinkConnectorConfig config = new ExampleSinkConnectorConfig(settings);
 
     /**
      * Do whatever you need to do to setup your connector on a global scale. This is something that
@@ -43,7 +42,7 @@ public class ExampleSinkConnector extends SinkConnector {
 
   @Override
   public Class<? extends Task> taskClass() {
-    return ExampleSinkTask.class;
+    return AerospikeSinkTask.class;
   }
 
   @Override
@@ -58,7 +57,7 @@ public class ExampleSinkConnector extends SinkConnector {
 
   @Override
   public ConfigDef config() {
-    return ExampleSinkConnectorConfig.config(ExampleSinkConnectorConfig.DEFAULT_CONFIG_OPTIONS);
+    return AerospikeConnectorConfig.config();
   }
 
   @Override

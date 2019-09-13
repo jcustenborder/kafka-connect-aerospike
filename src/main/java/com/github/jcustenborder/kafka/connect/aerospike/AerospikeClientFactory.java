@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Introduction("This is information about the connector.")
-@Title("Title")
-@DocumentationWarning("This is a warning")
-@PluginOwner("jcustenborder")
-@PluginName("kafka-connect-example")
-package com.github.jcustenborder.kafka.connect.example;
+package com.github.jcustenborder.kafka.connect.aerospike;
 
-import com.github.jcustenborder.kafka.connect.utils.config.DocumentationWarning;
-import com.github.jcustenborder.kafka.connect.utils.config.Introduction;
-import com.github.jcustenborder.kafka.connect.utils.config.PluginName;
-import com.github.jcustenborder.kafka.connect.utils.config.PluginOwner;
-import com.github.jcustenborder.kafka.connect.utils.config.Title;
+import com.aerospike.client.IAerospikeClient;
+
+interface AerospikeClientFactory {
+  IAerospikeClient create(AerospikeConnectorConfig config);
+}
