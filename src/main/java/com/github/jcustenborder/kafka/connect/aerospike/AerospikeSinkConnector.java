@@ -17,6 +17,7 @@ package com.github.jcustenborder.kafka.connect.aerospike;
 
 import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationNote;
 import com.github.jcustenborder.kafka.connect.utils.config.TaskConfigs;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
@@ -25,18 +26,16 @@ import org.apache.kafka.connect.sink.SinkConnector;
 import java.util.List;
 import java.util.Map;
 
-@Description("This is the description of the connector.")
+@Description("The Aerospike sink connector is used to write data to an Aerospike cluster.")
+@DocumentationNote("Aerospike does not support complex keys. This means that all keys presented to" +
+    " this connector must be a string, bytes, int, long, double, or float. Use a Single Message " +
+    "transformation to change the format of the incoming data.")
 public class AerospikeSinkConnector extends SinkConnector {
   Map<String, String> settings;
 
   @Override
   public void start(Map<String, String> settings) {
-
-    /**
-     * Do whatever you need to do to setup your connector on a global scale. This is something that
-     * will execute once per connector instance.
-     */
-
+    AerospikeConnectorConfig config = new AerospikeConnectorConfig(settings);
     this.settings = settings;
   }
 

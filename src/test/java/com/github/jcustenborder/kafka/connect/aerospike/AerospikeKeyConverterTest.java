@@ -44,6 +44,16 @@ public class AerospikeKeyConverterTest {
 
   AerospikeKeyConverter converter;
 
+  static TestCase test(Object value, Value keyValue) {
+    Key expected = new Key(NAMESPACE, TOPIC, keyValue);
+    return new TestCase(new SchemaAndValue(null, value), expected);
+  }
+
+  static TestCase test(Schema schema, Object value, Value keyValue) {
+    Key expected = new Key(NAMESPACE, TOPIC, keyValue);
+    return new TestCase(new SchemaAndValue(schema, value), expected);
+  }
+
   @BeforeEach
   public void before() {
     this.converter = new AerospikeKeyConverter(NAMESPACE);
@@ -82,6 +92,38 @@ public class AerospikeKeyConverterTest {
     });
   }
 
+  @TestFactory
+  public Stream<DynamicTest> convertSchema() {
+    return Arrays.asList(
+        test(Schema.STRING_SCHEMA, "foo", Value.get("foo")),
+        test(Schema.INT64_SCHEMA, Long.MAX_VALUE, Value.get(Long.MAX_VALUE)),
+        test(Schema.INT32_SCHEMA, Integer.MAX_VALUE, Value.get(Integer.MAX_VALUE)),
+        test(Schema.INT8_SCHEMA, Byte.MAX_VALUE, Value.get(Byte.MAX_VALUE))
+    ).stream()
+        .map(testCase -> dynamicTest(testCase.toString(), () -> {
+          SinkRecord record = record(testCase.input);
+          Key actual = this.converter.convert(record);
+          assertNotNull(actual);
+          assertEquals(testCase.expected, actual);
+        }));
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> convertSchemaLess() {
+    return Arrays.asList(
+        test("foo", Value.get("foo")),
+        test(Long.MAX_VALUE, Value.get(Long.MAX_VALUE)),
+        test(Integer.MAX_VALUE, Value.get(Integer.MAX_VALUE)),
+        test(Byte.MAX_VALUE, Value.get(Byte.MAX_VALUE))
+    ).stream()
+        .map(testCase -> dynamicTest(testCase.toString(), () -> {
+          SinkRecord record = record(testCase.input);
+          Key actual = this.converter.convert(record);
+          assertNotNull(actual);
+          assertEquals(testCase.expected, actual);
+        }));
+  }
+
   static class TestCase {
     final SchemaAndValue input;
     final Key expected;
@@ -99,48 +141,6 @@ public class AerospikeKeyConverterTest {
           .add("valueClass", input.value().getClass().getSimpleName())
           .toString();
     }
-  }
-
-  static TestCase test(Object value, Value keyValue) {
-    Key expected = new Key(NAMESPACE, TOPIC, keyValue);
-    return new TestCase(new SchemaAndValue(null, value), expected);
-  }
-
-  static TestCase test(Schema schema, Object value, Value keyValue) {
-    Key expected = new Key(NAMESPACE, TOPIC, keyValue);
-    return new TestCase(new SchemaAndValue(schema, value), expected);
-  }
-
-  @TestFactory
-  public Stream<DynamicTest> convertSchema() {
-    return Arrays.asList(
-        test(Schema.STRING_SCHEMA, "foo", Value.get("foo")),
-        test(Schema.INT64_SCHEMA, Long.MAX_VALUE, Value.get(Long.MAX_VALUE)),
-        test(Schema.INT32_SCHEMA, Integer.MAX_VALUE, Value.get(Integer.MAX_VALUE)),
-        test(Schema.INT8_SCHEMA, Byte.MAX_VALUE, Value.get(Byte.MAX_VALUE))
-        ).stream()
-        .map(testCase -> dynamicTest(testCase.toString(), () -> {
-          SinkRecord record = record(testCase.input);
-          Key actual = this.converter.convert(record);
-          assertNotNull(actual);
-          assertEquals(testCase.expected, actual);
-        }));
-  }
-
-  @TestFactory
-  public Stream<DynamicTest> convertSchemaLess() {
-    return Arrays.asList(
-        test("foo", Value.get("foo")),
-        test(Long.MAX_VALUE, Value.get(Long.MAX_VALUE)),
-        test(Integer.MAX_VALUE, Value.get(Integer.MAX_VALUE)),
-        test(Byte.MAX_VALUE, Value.get(Byte.MAX_VALUE))
-        ).stream()
-        .map(testCase -> dynamicTest(testCase.toString(), () -> {
-          SinkRecord record = record(testCase.input);
-          Key actual = this.converter.convert(record);
-          assertNotNull(actual);
-          assertEquals(testCase.expected, actual);
-        }));
   }
 
 

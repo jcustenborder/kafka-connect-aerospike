@@ -39,6 +39,7 @@ class AerospikeKeyConverter {
       Schema.Type.BYTES
   );
   final String namespace;
+
   AerospikeKeyConverter(String namespace) {
     this.namespace = namespace;
   }

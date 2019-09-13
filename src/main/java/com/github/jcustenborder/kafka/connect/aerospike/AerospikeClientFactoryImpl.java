@@ -24,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class AerospikeClientFactoryImpl implements AerospikeClientFactory {
+  private static final Logger log = LoggerFactory.getLogger(AerospikeClientFactoryImpl.class);
+
   static {
     Log.setCallback(AerospikeLogCallback.INSTANCE);
     Log.setLevel(Log.Level.DEBUG);
   }
-
-  private static final Logger log = LoggerFactory.getLogger(AerospikeClientFactoryImpl.class);
 
   @Override
   public IAerospikeClient create(AerospikeConnectorConfig config) {

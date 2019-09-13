@@ -52,13 +52,12 @@ import static org.mockito.Mockito.when;
 
 
 public abstract class AbstractAerospikeSinkTaskIT {
+  protected static final String NAMESPACE = "test";
   private static final Logger log = LoggerFactory.getLogger(AbstractAerospikeSinkTaskIT.class);
   protected AerospikeSinkTask task;
   protected SinkTaskContext sinkTaskContext;
   protected Map<String, String> settings;
   protected MySinkRecordHelper recordHelper;
-  protected static final String NAMESPACE = "test";
-
   protected IAerospikeClient aerospikeClient;
 
   protected abstract IAerospikeClient client(InetSocketAddress address);

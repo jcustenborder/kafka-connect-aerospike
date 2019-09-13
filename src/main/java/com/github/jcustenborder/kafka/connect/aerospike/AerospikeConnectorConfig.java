@@ -42,6 +42,38 @@ class AerospikeConnectorConfig extends AbstractConfig {
   public static final String CONNECT_OFFSET_SET_CONFIG = "connect.offset.set.name";
   public static final String CONNECT_OFFSET_SET_DOC = "The set name in the namespace that is used " +
       "to store the offsets that have been successfully written to Aerospike.";
+  public static final String HOSTS_CONFIG = "hosts";
+  public static final String HOSTS_DOC = "Hostnames are parsed from the standard Aerospike format. Ex `hostname1[:tlsname1][:port1],...`";
+  public static final String HOSTS_DEFAULT_PORT_CONFIG = "hosts.default.port";
+  public static final String HOSTS_DEFAULT_PORT_DOC = "The default port to use to connect to Aerospike.";
+  public static final String DEFAULT_CONNECT_OFFSET_SET = "_connect_offsets";
+  public static final String CONN_USERNAME_CONFIG = "connection.username";
+  public static final String CONN_USERNAME_DOC = "User authentication to cluster. Leave null for clusters running without restricted access.";
+  public static final String CONN_PASSWORD_CONFIG = "connection.password";
+  public static final String CONN_PASSWORD_DOC = "Password authentication to cluster. The password will be stored by the client and sent to server in hashed format. Leave null for clusters running without restricted access.";
+  public static final String CONN_CLUSTER_NAME_CONFIG = "connection.cluster.name";
+  public static final String CONN_CLUSTER_NAME_DOC = "Expected cluster name. If not null, server nodes must return this cluster name in order to join the client's view of the cluster. Should only be set when connecting to servers that support `the cluster-name` info command.";
+  public static final String CONN_CONNECTION_POOLS_PER_NODE_CONFIG = "connection.pools.per.node";
+  public static final String CONN_CONNECTION_POOLS_PER_NODE_DOC = "Number of synchronous connection pools used for each node.";
+  public static final String CONN_CONNECTION_MAX_PER_NODE_CONFIG = "connection.per.node.max";
+  public static final String CONN_CONNECTION_MAX_PER_NODE_DOC = "Maximum number of connections allowed per server node.";
+  public static final String CONN_CONNECTION_MAX_SOCKET_IDLE_CONFIG = "connection.socket.idle.timeout.ms";
+  public static final String CONN_CONNECTION_MAX_SOCKET_IDLE_DOC = "Maximum socket idle in milliseconds.";
+  public static final String CONN_CONNECTION_LOGIN_TIMEOUT_CONFIG = "connection.login.timeout.ms";
+  public static final String CONN_CONNECTION_LOGIN_TIMEOUT_DOC = "Login timeout in milliseconds.";
+  public static final String CONN_RACK_ID_CONFIG = "connection.rack.aware.id";
+  public static final String CONN_RACK_ID_DOC = "Rack where this client instance resides.";
+  public static final String CONN_RACK_ENABLED_CONFIG = "connection.rack.aware.enabled";
+  public static final String CONN_RACK_ENABLED_DOC = "Flag to determine if the client should track server rack data.";
+  public static final String GROUP_WRITES = "Writes";
+  public static final String WRITE_POLICY_COMMIT_LEVEL_CONF = "write.policy.commit.level";
+  public static final String WRITE_POLICY_COMMIT_LEVEL_DOC = "Desired consistency guarantee when committing a transaction on the server. " +
+      "`COMMIT_ALL` - Server should wait until successfully committing master and all replicas. " +
+      "`COMMIT_MASTER` - Server should wait until successfully committing master only.";
+  public static final String WRITE_POLICY_DURABLE_DELETE_CONF = "write.policy.durable.delete.enabled";
+  public static final String WRITE_POLICY_DURABLE_DELETE_DOC = "If the transaction results in a record deletion, leave a tombstone for the record.";
+  public static final String WRITE_POLICY_SEND_KEY_CONF = "write.policy.send.key.enabled";
+  public static final String WRITE_POLICY_SEND_KEY_DOC = "Send user defined key in addition to hash digest on both reads and writes.";
   protected static final String GROUP_CONNECTION = "Connection";
   protected static final String GROUP_BATCH = "Batching";
   protected static final String GROUP_NAMESPACE = "Namespace";
@@ -53,13 +85,6 @@ class AerospikeConnectorConfig extends AbstractConfig {
       "server's receiving thread when the server deems it to be appropriate.";
   static final String BATCH_CONCURRENT_THREADS_MAX_DOC = "Maximum number of concurrent synchronous " +
       "batch request threads to server nodes at any point in time.";
-
-  public static final String HOSTS_CONFIG = "hosts";
-  public static final String HOSTS_DOC = "Hostnames are parsed from the standard Aerospike format. Ex `hostname1[:tlsname1][:port1],...`";
-  public static final String HOSTS_DEFAULT_PORT_CONFIG = "hosts.default.port";
-  public static final String HOSTS_DEFAULT_PORT_DOC = "The default port to use to connect to Aerospike.";
-
-
   public final String namespace;
   public final String offsetSetName;
   public final String hosts;
@@ -73,13 +98,9 @@ class AerospikeConnectorConfig extends AbstractConfig {
   public final boolean connRackAwareEnabled;
   public final int connRackId;
   public final int connLoginTimeout;
-
   public final CommitLevel writeCommitLevel;
   public final boolean writeDurableDelete;
   public final boolean writeSendKey;
-
-  public static final String DEFAULT_CONNECT_OFFSET_SET = "_connect_offsets";
-
   public AerospikeConnectorConfig(Map<?, ?> originals) {
     super(config(), originals);
     this.namespace = getString(NAMESPACE_CONFIG);
@@ -105,43 +126,6 @@ class AerospikeConnectorConfig extends AbstractConfig {
     this.writeDurableDelete = getBoolean(WRITE_POLICY_DURABLE_DELETE_CONF);
     this.writeSendKey = getBoolean(WRITE_POLICY_SEND_KEY_CONF);
   }
-
-  public static final String CONN_USERNAME_CONFIG = "connection.username";
-  public static final String CONN_USERNAME_DOC = "User authentication to cluster. Leave null for clusters running without restricted access.";
-  public static final String CONN_PASSWORD_CONFIG = "connection.password";
-  public static final String CONN_PASSWORD_DOC = "Password authentication to cluster. The password will be stored by the client and sent to server in hashed format. Leave null for clusters running without restricted access.";
-  public static final String CONN_CLUSTER_NAME_CONFIG = "connection.cluster.name";
-  public static final String CONN_CLUSTER_NAME_DOC = "Expected cluster name. If not null, server nodes must return this cluster name in order to join the client's view of the cluster. Should only be set when connecting to servers that support `the cluster-name` info command.";
-  public static final String CONN_CONNECTION_POOLS_PER_NODE_CONFIG = "connection.pools.per.node";
-  public static final String CONN_CONNECTION_POOLS_PER_NODE_DOC = "Number of synchronous connection pools used for each node.";
-
-  public static final String CONN_CONNECTION_MAX_PER_NODE_CONFIG = "connection.per.node.max";
-  public static final String CONN_CONNECTION_MAX_PER_NODE_DOC = "Maximum number of connections allowed per server node.";
-
-  public static final String CONN_CONNECTION_MAX_SOCKET_IDLE_CONFIG = "connection.socket.idle.timeout.ms";
-  public static final String CONN_CONNECTION_MAX_SOCKET_IDLE_DOC = "Maximum socket idle in milliseconds.";
-
-  public static final String CONN_CONNECTION_LOGIN_TIMEOUT_CONFIG = "connection.login.timeout.ms";
-  public static final String CONN_CONNECTION_LOGIN_TIMEOUT_DOC = "Login timeout in milliseconds.";
-
-  public static final String CONN_RACK_ID_CONFIG = "connection.rack.aware.id";
-  public static final String CONN_RACK_ID_DOC = "Rack where this client instance resides.";
-
-  public static final String CONN_RACK_ENABLED_CONFIG = "connection.rack.aware.enabled";
-  public static final String CONN_RACK_ENABLED_DOC = "Flag to determine if the client should track server rack data.";
-
-  public static final String GROUP_WRITES = "Writes";
-
-  public static final String WRITE_POLICY_COMMIT_LEVEL_CONF = "write.policy.commit.level";
-  public static final String WRITE_POLICY_COMMIT_LEVEL_DOC = "Desired consistency guarantee when committing a transaction on the server. " +
-      "`COMMIT_ALL` - Server should wait until successfully committing master and all replicas. " +
-      "`COMMIT_MASTER` - Server should wait until successfully committing master only.";
-  public static final String WRITE_POLICY_DURABLE_DELETE_CONF = "write.policy.durable.delete.enabled";
-  public static final String WRITE_POLICY_DURABLE_DELETE_DOC = "If the transaction results in a record deletion, leave a tombstone for the record.";
-
-  public static final String WRITE_POLICY_SEND_KEY_CONF = "write.policy.send.key.enabled";
-  public static final String WRITE_POLICY_SEND_KEY_DOC = "Send user defined key in addition to hash digest on both reads and writes.";
-
 
   public static ConfigDef config() {
     //Create an instance of a client policy to grab the defaults from.

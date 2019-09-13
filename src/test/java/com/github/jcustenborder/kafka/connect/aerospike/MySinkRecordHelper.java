@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2019 Jeremy Custenborder (jcustenborder@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jcustenborder.kafka.connect.aerospike;
 
 import com.github.jcustenborder.kafka.connect.utils.SinkRecordHelper;
@@ -18,8 +33,8 @@ import java.util.stream.Collectors;
 
 class MySinkRecordHelper extends SinkRecordHelper {
   private static final Logger log = LoggerFactory.getLogger(MySinkRecordHelper.class);
-  private List<State> states = new ArrayList<>();
   Map<TopicPartition, OffsetAndMetadata> offsets = new LinkedHashMap<>();
+  private List<State> states = new ArrayList<>();
 
   public Map<TopicPartition, OffsetAndMetadata> offsets() {
     return offsets;
@@ -53,21 +68,6 @@ class MySinkRecordHelper extends SinkRecordHelper {
         .map(s -> s.record)
         .collect(Collectors.toList());
   }
-
-  static class State {
-    final Consumer<SinkRecord> verification;
-    final SinkRecord record;
-
-    State(Consumer<SinkRecord> verification, SinkRecord record) {
-      this.verification = verification;
-      this.record = record;
-    }
-
-    public static State of(Consumer<SinkRecord> verification, SinkRecord record) {
-      return new State(verification, record);
-    }
-  }
-
 
   public void clear() {
     this.states.clear();
@@ -123,6 +123,20 @@ class MySinkRecordHelper extends SinkRecordHelper {
     State state = State.of(validate, result);
     this.states.add(state);
     return result;
+  }
+
+  static class State {
+    final Consumer<SinkRecord> verification;
+    final SinkRecord record;
+
+    State(Consumer<SinkRecord> verification, SinkRecord record) {
+      this.verification = verification;
+      this.record = record;
+    }
+
+    public static State of(Consumer<SinkRecord> verification, SinkRecord record) {
+      return new State(verification, record);
+    }
   }
 
 }
