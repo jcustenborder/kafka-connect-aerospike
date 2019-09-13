@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 @Introduction("This plugin provides a mechanism to write data from Kafka to an Aerospike " +
-    "installation.")
+    "clsuter.")
 @Title("Aerospike")
 @PluginOwner("jcustenborder")
 @PluginName("kafka-connect-aerospike")
