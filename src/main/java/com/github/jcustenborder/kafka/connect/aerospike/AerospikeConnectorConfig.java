@@ -18,6 +18,7 @@ package com.github.jcustenborder.kafka.connect.aerospike;
 import com.aerospike.client.Host;
 import com.aerospike.client.policy.AuthMode;
 import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.policy.CommitLevel;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyBuilder;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
 import com.github.jcustenborder.kafka.connect.utils.config.recommenders.Recommenders;
@@ -71,6 +72,11 @@ class AerospikeConnectorConfig extends AbstractConfig {
   public final int connMaxSocketIdle;
   public final boolean connRackAwareEnabled;
   public final int connRackId;
+  public final int connLoginTimeout;
+
+  public final CommitLevel writeCommitLevel;
+  public final boolean writeDurableDelete;
+  public final boolean writeSendKey;
 
   public static final String DEFAULT_CONNECT_OFFSET_SET = "_connect_offsets";
 
@@ -84,7 +90,7 @@ class AerospikeConnectorConfig extends AbstractConfig {
     String username = getString(CONN_USERNAME_CONFIG);
     this.username = Strings.isNullOrEmpty(username) ? null : username;
     String password = getString(CONN_PASSWORD_CONFIG);
-    this.password = Strings.isNullOrEmpty(username) ? null : password;
+    this.password = Strings.isNullOrEmpty(password) ? null : password;
     String connClusterName = getString(CONN_CLUSTER_NAME_CONFIG);
     this.connClusterName = Strings.isNullOrEmpty(connClusterName) ? null : connClusterName;
     this.connMaxConnsPerNode = getInt(CONN_CONNECTION_MAX_PER_NODE_CONFIG);
@@ -93,6 +99,11 @@ class AerospikeConnectorConfig extends AbstractConfig {
     );
     this.connRackAwareEnabled = getBoolean(CONN_RACK_ENABLED_CONFIG);
     this.connRackId = getInt(CONN_RACK_ID_CONFIG);
+    this.connLoginTimeout = getInt(CONN_CONNECTION_LOGIN_TIMEOUT_CONFIG);
+
+    this.writeCommitLevel = ConfigUtils.getEnum(CommitLevel.class, this, WRITE_POLICY_COMMIT_LEVEL_CONF);
+    this.writeDurableDelete = getBoolean(WRITE_POLICY_DURABLE_DELETE_CONF);
+    this.writeSendKey = getBoolean(WRITE_POLICY_SEND_KEY_CONF);
   }
 
   public static final String CONN_USERNAME_CONFIG = "connection.username";
@@ -118,6 +129,19 @@ class AerospikeConnectorConfig extends AbstractConfig {
 
   public static final String CONN_RACK_ENABLED_CONFIG = "connection.rack.aware.enabled";
   public static final String CONN_RACK_ENABLED_DOC = "Flag to determine if the client should track server rack data.";
+
+  public static final String GROUP_WRITES = "Writes";
+
+  public static final String WRITE_POLICY_COMMIT_LEVEL_CONF = "write.policy.commit.level";
+  public static final String WRITE_POLICY_COMMIT_LEVEL_DOC = "Desired consistency guarantee when committing a transaction on the server. " +
+      "`COMMIT_ALL` - Server should wait until successfully committing master and all replicas. " +
+      "`COMMIT_MASTER` - Server should wait until successfully committing master only.";
+  public static final String WRITE_POLICY_DURABLE_DELETE_CONF = "write.policy.durable.delete.enabled";
+  public static final String WRITE_POLICY_DURABLE_DELETE_DOC = "If the transaction results in a record deletion, leave a tombstone for the record.";
+
+  public static final String WRITE_POLICY_SEND_KEY_CONF = "write.policy.send.key.enabled";
+  public static final String WRITE_POLICY_SEND_KEY_DOC = "Send user defined key in addition to hash digest on both reads and writes.";
+
 
   public static ConfigDef config() {
     //Create an instance of a client policy to grab the defaults from.
@@ -249,6 +273,32 @@ class AerospikeConnectorConfig extends AbstractConfig {
                 .group(GROUP_BATCH)
                 .defaultValue(defaultClientPolicy.batchPolicyDefault.maxConcurrentThreads)
                 .build()
+        )
+
+        //Writes
+        .define(
+            ConfigKeyBuilder.of(WRITE_POLICY_COMMIT_LEVEL_CONF, Type.STRING)
+                .documentation(WRITE_POLICY_COMMIT_LEVEL_DOC)
+                .importance(Importance.LOW)
+                .group(GROUP_WRITES)
+                .defaultValue(defaultClientPolicy.writePolicyDefault.commitLevel.toString())
+                .recommender(Recommenders.enumValues(CommitLevel.class))
+                .validator(Validators.validEnum(CommitLevel.class))
+                .build()
+        ).define(
+            ConfigKeyBuilder.of(WRITE_POLICY_DURABLE_DELETE_CONF, Type.BOOLEAN)
+                .documentation(WRITE_POLICY_DURABLE_DELETE_DOC)
+                .importance(Importance.LOW)
+                .group(GROUP_WRITES)
+                .defaultValue(defaultClientPolicy.writePolicyDefault.sendKey)
+                .build()
+        ).define(
+            ConfigKeyBuilder.of(WRITE_POLICY_SEND_KEY_CONF, Type.BOOLEAN)
+                .documentation(WRITE_POLICY_SEND_KEY_DOC)
+                .importance(Importance.LOW)
+                .group(GROUP_WRITES)
+                .defaultValue(defaultClientPolicy.writePolicyDefault.sendKey)
+                .build()
         );
   }
 
@@ -264,6 +314,10 @@ class AerospikeConnectorConfig extends AbstractConfig {
     result.maxSocketIdle = this.connMaxSocketIdle;
     result.rackAware = this.connRackAwareEnabled;
     result.rackId = this.connRackId;
+    result.loginTimeout = this.connLoginTimeout;
+    result.writePolicyDefault.commitLevel = this.writeCommitLevel;
+    result.writePolicyDefault.durableDelete = this.writeDurableDelete;
+    result.writePolicyDefault.sendKey = this.writeSendKey;
 
     if (!Strings.isNullOrEmpty(this.username)) {
       result.user = this.username;
