@@ -11,6 +11,7 @@ This plugin provides a mechanism to write data from Kafka to an Aerospike instal
 The Aerospike sink connector is used to write data to an Aerospike cluster.
 
 
+
 # Development
 
 ## Building the source
