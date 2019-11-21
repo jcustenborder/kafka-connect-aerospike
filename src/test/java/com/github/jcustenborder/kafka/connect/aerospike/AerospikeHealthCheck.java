@@ -21,14 +21,23 @@ import com.palantir.docker.compose.connection.Container;
 import com.palantir.docker.compose.connection.DockerPort;
 import com.palantir.docker.compose.connection.waiting.ClusterHealthCheck;
 import com.palantir.docker.compose.connection.waiting.SuccessOrFailure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AerospikeHealthCheck implements ClusterHealthCheck {
+  private static final Logger log = LoggerFactory.getLogger(AerospikeHealthCheck.class);
+
   @Override
   public SuccessOrFailure isClusterHealthy(Cluster cluster) throws InterruptedException {
     Container container = cluster.container("aerospike");
     DockerPort dockerPort = container.port(3000);
-    try (AerospikeClient client = new AerospikeClient(dockerPort.getIp(), dockerPort.getExternalPort())) {
-      return SuccessOrFailure.fromBoolean(client.isConnected(), "Client not connected");
-    }
+
+    return SuccessOrFailure.onResultOf(() -> {
+      log.info("Connecting {}:{}", dockerPort.getIp(), dockerPort.getExternalPort());
+      try (AerospikeClient client = new AerospikeClient(dockerPort.getIp(), dockerPort.getExternalPort())) {
+        return client.isConnected();
+      }
+    });
+
   }
 }
