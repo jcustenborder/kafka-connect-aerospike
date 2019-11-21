@@ -1,0 +1,54 @@
+{
+  "description": "This example connects to an AeroSpike instance without authentication.",
+  "name": "Anonymous",
+  "config": {
+    "namespace": "test",
+    "hosts": "127.0.0.1:3000"
+  },
+  "transformations": {},
+  "output": "put('dataTypeBOOLEANnull', {'testField':true})",
+  "input": {
+    "topic": "dataTypeBOOLEANnull",
+    "kafkaPartition": 0,
+    "keySchema": {
+      "type": "STRING",
+      "isOptional": false
+    },
+    "key": "key-dataTypeBOOLEANnull",
+    "valueSchema": {
+      "type": "STRUCT",
+      "isOptional": false,
+      "fieldSchemas": {
+        "testField": {
+          "type": "BOOLEAN",
+          "isOptional": false
+        }
+      }
+    },
+    "value": {
+      "schema": {
+        "type": "STRUCT",
+        "isOptional": false,
+        "fieldSchemas": {
+          "testField": {
+            "type": "BOOLEAN",
+            "isOptional": false
+          }
+        }
+      },
+      "fieldValues": [
+        {
+          "name": "testField",
+          "schema": {
+            "type": "BOOLEAN",
+            "isOptional": false
+          },
+          "storage": true
+        }
+      ]
+    },
+    "timestampType": "NO_TIMESTAMP_TYPE",
+    "offset": 0,
+    "headers": []
+  }
+}

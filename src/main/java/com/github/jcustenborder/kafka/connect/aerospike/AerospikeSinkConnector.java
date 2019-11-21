@@ -28,7 +28,8 @@ import java.util.Map;
 
 @Description("The Aerospike sink connector is used to write data to an Aerospike cluster.")
 @DocumentationNote("Aerospike does not support complex keys. This means that all keys presented to" +
-    " this connector must be a string, bytes, int, long, double, or float. Use a Single Message " +
+    " this connector must be a string, bytes, int, long, double, or float. If the data in your key " +
+    "is a struct, use a Single Message " +
     "transformation to change the format of the incoming data.")
 public class AerospikeSinkConnector extends SinkConnector {
   Map<String, String> settings;
