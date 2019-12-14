@@ -68,25 +68,34 @@
 </dependencies>
     <build>
         <plugins>
-            <!--
-            Uncomment to prepare a package for the Confluent Hub.
             <plugin>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-connect-maven-plugin</artifactId>
-                <configuration>
-                    <documentationUrl>
-                        https://jcustenborder.github.io/kafka-connect-documentation/
-                    </documentationUrl>
-                    <componentTypes>
-                        <componentType>sink</componentType>
-                    </componentTypes>
-                    <tags>
-                        <tag>Redis</tag>
-                    </tags>
-                    <title>Kafka Connect Redis</title>
-                </configuration>
+                <version>0.11.2</version>
+                <executions>
+                    <execution>
+                        <id>hub</id>
+                        <goals>
+                            <goal>kafka-connect</goal>
+                        </goals>
+                        <configuration>
+                            <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
+                            <documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/projects/kafka-connect-aerospike/
+                            </documentationUrl>
+                            <componentTypes>
+                                <componentType>sink</componentType>
+                            </componentTypes>
+                            <tags>
+                                <tag>aerospike</tag>
+                            </tags>
+                            <title>Kafka Connect Aerospike</title>
+                            <supportProviderName>Jeremy Custenborder</supportProviderName>
+                            <supportUrl>${project.issueManagement.url}/</supportUrl>
+                            <supportSummary>This connector is supported through community support.</supportSummary>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
-            -->
         </plugins>
     </build>
 </project>
