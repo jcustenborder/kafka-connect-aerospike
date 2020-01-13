@@ -27,7 +27,7 @@
         <version>2.2.1-cp1</version>
     </parent>
     <artifactId>kafka-connect-aerospike</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <name>kafka-connect-aerospike</name>
     <description>A Kafka Connect connector receiving data from aerospike.</description>
     <url>https://github.com/jcustenborder/kafka-connect-aerospike</url>
@@ -80,8 +80,7 @@
                         </goals>
                         <configuration>
                             <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
-                            <documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/projects/kafka-connect-aerospike/
-                            </documentationUrl>
+                            <documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/projects/kafka-connect-aerospike/index.html</documentationUrl>
                             <componentTypes>
                                 <componentType>sink</componentType>
                             </componentTypes>
