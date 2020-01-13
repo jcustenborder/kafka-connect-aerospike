@@ -15,7 +15,7 @@
  */
 @Introduction("This plugin provides a mechanism to write data from Kafka to an Aerospike " +
     "cluster.")
-@Title("Aerospike Connectors")
+@Title("Aerospike")
 @PluginOwner("jcustenborder")
 @PluginName("kafka-connect-aerospike")
 package com.github.jcustenborder.kafka.connect.aerospike;
